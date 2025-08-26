@@ -1,0 +1,50 @@
+name: train-and-evaluate-flappy
+
+on:
+  workflow_dispatch: {}
+  # Uncomment to run on pushes to main:
+  # push:
+  #   branches: [ main ]
+
+jobs:
+  rl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      MPLBACKEND: Agg          # headless matplotlib
+      OMP_NUM_THREADS: "1"     # keep CPU deterministic-ish
+      MKL_NUM_THREADS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies (requirements.txt if present)
+        if: hashFiles('requirements.txt') != ''
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+
+      - name: Install dependencies (fallback minimal set)
+        if: hashFiles('requirements.txt') == ''
+        run: |
+          python -m pip install -U pip
+          pip install gymnasium==1.2.0 stable-baselines3==2.7.0 torch numpy matplotlib imageio
+
+      - name: Train (CPU)
+        run: |
+          set -eux
+          python -u train.py 2>&1 | tee train.log
+
+      - name: Evaluate (no render)
+        run: |
+          set -eux
+          mkdir -p eval_logs
+          # adjust flags to match your evaluate.py; no --render and no GIF
+          python -u evaluate.py --deterministic --episodes 20 | tee eval_logs/eval.txt
+
