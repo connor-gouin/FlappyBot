@@ -1,4 +1,4 @@
 *.venv/*
-*__pycache__/**
+envs/__pycache__/*
 *models/*
 *tb/**
