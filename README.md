@@ -204,11 +204,3 @@ model = PPO(
 - Use `--deterministic` for final eval (greedy actions).
 - Without it, actions are sampled (adds noise; good for robustness checks).
 
----
-
-## 🧭 Tips & Curriculum
-
-- **Break the 1-pipe plateau**: increase pass reward (`+3`→`+4`), reduce alive bonus (`0.02`→`0.01`), keep the gap-centering bonus, try `ent_coef=0.02–0.03`.
-- **Curriculum**: start easier (`pipe_gap=0.30`, `pipe_speed=0.006`), train until avg ≥ 3–5 pipes, then harden settings.
-- **Parallelism**: use `SubprocVecEnv` with 8–16 envs if your CPU can handle it.
-- **Seeds**: you can train with one seed and evaluate with another; fix seeds for reproducible evals.
